@@ -1,0 +1,45 @@
+{{template "header" .}}
+
+{{template "navigation" .}}
+
+<div class="container">
+  <form method="POST" action="/login">
+	  <div class="form-group">
+	    <label>Account</label>
+	    <input class="form-control" id="uname" placeholder="Enter account" name="uname">
+	  </div>
+	  <div class="form-group">
+	    <label>Password</label>
+	    <input type="password" id="pwd" class="form-control" placeholder="Password" name="pwd">
+	  </div>
+	  <div class="checkbox">
+	    <label>
+	      <input type="checkbox" name="autoLogin"> 记住登录
+	    </label>
+	  </div>
+	  <button type="submit" class="btn btn-default" onclick="return checkInput()">登录</button>
+	  <button type="submit" class="btn btn-default" onclick="return backToHome()">返回</button>
+	</form>
+	<script>
+		function checkInput() {
+			var $uname = document.getElementById("uname");
+			var $pwd = document.getElementById("pwd");
+			if(!$uname.value) {
+				alert("请输入用户名");
+				return false;
+			}			
+			
+			if(!$pwd.value) {
+				alert("请输入密码");
+				return false;
+			}
+			return true;
+		}
+		function backToHome() {
+			window.location.href="/";
+			return false;
+		}
+	</script>
+</div>
+
+{{template "footer" .}}
