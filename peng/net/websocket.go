@@ -1,8 +1,8 @@
 package net
 
 import (
-	"code.google.com/p/go.net/websocket"
 	"fmt"
+	"github.com/hashicorp/go.net/websocket"
 	"html/template"
 	"log"
 	"net/http"
