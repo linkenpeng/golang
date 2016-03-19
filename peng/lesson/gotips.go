@@ -47,7 +47,7 @@ func helloWorld() {
 }
 
 // 2.变量类型
-func typeDemo() {
+func TypeDemo() {
 	// 变量声明
 	var v1 int
 	var (

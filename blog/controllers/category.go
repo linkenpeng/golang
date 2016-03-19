@@ -42,6 +42,7 @@ func (c *CategoryController) Get() {
 
 	c.Data["Title"] = "我的博客首页"
 	c.Data["IsCategory"] = true
+	c.Data["IsLogin"] = checkAccount(c.Ctx)
 
 	var err error
 	c.Data["Category"], err = models.GetAllCategorys()

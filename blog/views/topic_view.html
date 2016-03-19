@@ -1,0 +1,13 @@
+{{template "header" .}}
+
+{{template "navigation" .}}
+
+<div class="container">
+  <h1>{{.Topic.Title}}
+  <a href="/topic" class="btn btn-default">返回列表</a>
+  </h1>
+
+  <div>{{.Topic.Content}}</div>
+</div>
+
+{{template "footer" .}}

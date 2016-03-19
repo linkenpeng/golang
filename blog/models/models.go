@@ -73,15 +73,6 @@ func AddCategory(name string) error {
 	return nil
 }
 
-func GetAllCategorys() ([]*Category, error) {
-	o := orm.NewOrm()
-
-	cates := make([]*Category, 0)
-	qs := o.QueryTable("category")
-	_, err := qs.All(&cates)
-	return cates, err
-}
-
 func DelCategory(id string) error {
 	cid, err := strconv.ParseInt(id, 10, 64)
 	if err != nil {
@@ -92,4 +83,95 @@ func DelCategory(id string) error {
 	cate := &Category{Id: cid}
 	_, err = o.Delete(cate)
 	return err
+}
+
+func GetAllCategorys() ([]*Category, error) {
+	o := orm.NewOrm()
+
+	cates := make([]*Category, 0)
+	qs := o.QueryTable("category")
+	_, err := qs.All(&cates)
+	return cates, err
+}
+
+func AddTopic(title, content string) error {
+	o := orm.NewOrm()
+
+	topic := &Topic{
+		Title:   title,
+		Content: content,
+		Created: time.Now(),
+		Updated: time.Now(),
+	}
+
+	_, err := o.Insert(topic)
+	return err
+}
+
+func ModifyTopic(tid, title, content string) error {
+	tidNum, err := strconv.ParseInt(tid, 10, 64)
+	if err != nil {
+		return err
+	}
+
+	o := orm.NewOrm()
+
+	topic := &Topic{Id: tidNum}
+	if o.Read(topic) == nil {
+		topic.Title = title
+		topic.Content = content
+		topic.Updated = time.Now()
+		_, err = o.Update(topic)
+	}
+
+	return err
+}
+
+func DeleteTopic(id string) error {
+	tid, err := strconv.ParseInt(id, 10, 64)
+	if err != nil {
+		return err
+	}
+
+	o := orm.NewOrm()
+	topic := &Topic{Id: tid}
+	_, err = o.Delete(topic)
+	return err
+}
+
+func GetTopic(tid string) (*Topic, error) {
+	tidNum, err := strconv.ParseInt(tid, 10, 64)
+	if err != nil {
+		return nil, err
+	}
+
+	o := orm.NewOrm()
+
+	topic := new(Topic)
+
+	qs := o.QueryTable("topic")
+	err = qs.Filter("id", tidNum).One(topic)
+	if err != nil {
+		return nil, err
+	}
+
+	topic.Views++
+	_, err = o.Update(topic)
+	return topic, err
+}
+
+func GetAllTopics(isDesc bool) ([]*Topic, error) {
+	o := orm.NewOrm()
+
+	topics := make([]*Topic, 0)
+	qs := o.QueryTable("topic")
+
+	var err error
+	if isDesc {
+		_, err = qs.OrderBy("-created").All(&topics)
+	} else {
+		_, err = qs.All(&topics)
+	}
+
+	return topics, err
 }

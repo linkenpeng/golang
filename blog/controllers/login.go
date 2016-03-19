@@ -12,7 +12,7 @@ type LoginController struct {
 func (c *LoginController) Get() {
 	isExit := c.Input().Get("exit") == "true"
 	if isExit {
-		c.Ctx.SetCookie("uanem", "", -1, "/")
+		c.Ctx.SetCookie("uname", "", -1, "/")
 		c.Ctx.SetCookie("pwd", "", -1, "/")
 		c.Redirect("/", 301)
 		return
@@ -34,7 +34,7 @@ func (c *LoginController) Post() {
 			maxAge = 1<<31 - 1
 		}
 
-		c.Ctx.SetCookie("uanem", uname, maxAge, "/")
+		c.Ctx.SetCookie("uname", uname, maxAge, "/")
 		c.Ctx.SetCookie("pwd", pwd, maxAge, "/")
 	}
 

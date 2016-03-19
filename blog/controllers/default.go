@@ -2,18 +2,24 @@ package controllers
 
 import (
 	"github.com/astaxie/beego"
+	"golang/blog/models"
 )
 
 type MainController struct {
 	beego.Controller
 }
 
-func (c *MainController) Get() {
-	c.TplName = "home.html"
+func (this *MainController) Get() {
+	this.TplName = "home.html"
 
-	c.Data["Title"] = "我的博客首页"
-	c.Data["IsHome"] = true
+	this.Data["Title"] = "我的博客首页"
+	this.Data["IsHome"] = true
+	this.Data["IsLogin"] = checkAccount(this.Ctx)
 
-	c.Data["IsLogin"] = checkAccount(c.Ctx)
-	return
+	topics, err := models.GetAllTopics(true)
+	if err != nil {
+		beego.Error(err)
+	} else {
+		this.Data["Topics"] = topics
+	}
 }
