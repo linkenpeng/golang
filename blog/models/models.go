@@ -30,6 +30,7 @@ type Topic struct {
 	Id              int64
 	Uid             int64
 	Title           string
+	Catid           int64
 	Content         string `orm:"size(5000)"`
 	Attachment      string
 	Created         time.Time `orm:"index"`
@@ -94,22 +95,33 @@ func GetAllCategorys() ([]*Category, error) {
 	return cates, err
 }
 
-func AddTopic(title, content string) error {
+func AddTopic(title, catid, content string) error {
+	catIdNum, err := strconv.ParseInt(catid, 10, 64)
+	if err != nil {
+		return err
+	}
+
 	o := orm.NewOrm()
 
 	topic := &Topic{
 		Title:   title,
+		Catid:   catIdNum,
 		Content: content,
 		Created: time.Now(),
 		Updated: time.Now(),
 	}
 
-	_, err := o.Insert(topic)
+	_, err = o.Insert(topic)
 	return err
 }
 
-func ModifyTopic(tid, title, content string) error {
+func ModifyTopic(tid, title, catid, content string) error {
 	tidNum, err := strconv.ParseInt(tid, 10, 64)
+	if err != nil {
+		return err
+	}
+
+	catIdNum, err := strconv.ParseInt(catid, 10, 64)
 	if err != nil {
 		return err
 	}
@@ -119,6 +131,7 @@ func ModifyTopic(tid, title, content string) error {
 	topic := &Topic{Id: tidNum}
 	if o.Read(topic) == nil {
 		topic.Title = title
+		topic.Catid = catIdNum
 		topic.Content = content
 		topic.Updated = time.Now()
 		_, err = o.Update(topic)

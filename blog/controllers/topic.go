@@ -31,13 +31,14 @@ func (this *TopicController) Post() {
 
 	tid := this.Input().Get("tid")
 	title := this.Input().Get("title")
+	catid := this.Input().Get("catid")
 	content := this.Input().Get("content")
-	beego.Error(tid)
+
 	var err error
 	if len(tid) == 0 {
-		err = models.AddTopic(title, content)
+		err = models.AddTopic(title, catid, content)
 	} else {
-		err = models.ModifyTopic(tid, title, content)
+		err = models.ModifyTopic(tid, title, catid, content)
 	}
 
 	if err != nil {
@@ -51,6 +52,14 @@ func (this *TopicController) Add() {
 	this.Data["Title"] = "添加文章"
 	this.Data["IsLogin"] = checkAccount(this.Ctx)
 	this.Data["IsTopic"] = true
+
+	cates, err := models.GetAllCategorys()
+	if err != nil {
+		beego.Error(err)
+		this.Redirect("/topic", 302)
+	}
+	this.Data["Categorys"] = cates
+
 	this.TplName = "topic_add.html"
 }
 
@@ -82,6 +91,13 @@ func (this *TopicController) Modify() {
 		beego.Error(err)
 		this.Redirect("/", 302)
 	}
+
+	cates, err := models.GetAllCategorys()
+	if err != nil {
+		beego.Error(err)
+		this.Redirect("/topic", 302)
+	}
+	this.Data["Categorys"] = cates
 
 	this.Data["Topic"] = topic
 	this.Data["Title"] = topic.Title

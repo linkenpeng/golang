@@ -544,7 +544,7 @@ func fileDirDemo() {
 }
 
 // 拷贝文件
-func copyFile(source string, dest string) (err error) {
+func CopyFile(source string, dest string) (err error) {
 	sf, err := os.Open(source)
 	if err != nil {
 		return err
@@ -567,7 +567,7 @@ func copyFile(source string, dest string) (err error) {
 }
 
 // 拷贝目录
-func copyDir(source string, dest string) (err error) {
+func CopyDir(source string, dest string) (err error) {
 	fi, err := os.Stat(source)
 	if err != nil {
 		return err
@@ -583,13 +583,15 @@ func copyDir(source string, dest string) (err error) {
 	for _, entry := range entries {
 		sfp := filepath.Join(source, entry.Name())
 		dfp := filepath.Join(dest, entry.Name())
+		fmt.Println("sfp: " + sfp)
+		fmt.Println("dfp: " + dfp)
 		if entry.IsDir() {
-			err = copyDir(sfp, dfp)
+			err = CopyDir(sfp, dfp)
 			if err != nil {
 				fmt.Println(err)
 			}
 		} else {
-			err = copyFile(sfp, dfp)
+			err = CopyFile(sfp, dfp)
 			if err != nil {
 				fmt.Println(err)
 			}
