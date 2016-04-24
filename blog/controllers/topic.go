@@ -1,8 +1,10 @@
 package controllers
 
 import (
-	"github.com/astaxie/beego"
 	"golang/blog/models"
+	"path"
+
+	"github.com/astaxie/beego"
 )
 
 type TopicController struct {
@@ -34,11 +36,25 @@ func (this *TopicController) Post() {
 	catid := this.Input().Get("catid")
 	content := this.Input().Get("content")
 
-	var err error
+	_, fh, err := this.GetFile("attachment")
+	if err != nil {
+		beego.Error(err)
+	}
+
+	var attachment string
+	if fh != nil {
+		attachment = fh.Filename
+		beego.Info(attachment)
+		err = this.SaveToFile("attachment", path.Join("attachment", attachment))
+		if err != nil {
+			beego.Error(err)
+		}
+	}
+
 	if len(tid) == 0 {
-		err = models.AddTopic(title, catid, content)
+		err = models.AddTopic(title, catid, content, attachment)
 	} else {
-		err = models.ModifyTopic(tid, title, catid, content)
+		err = models.ModifyTopic(tid, title, catid, content, attachment)
 	}
 
 	if err != nil {
@@ -58,6 +74,7 @@ func (this *TopicController) Add() {
 		beego.Error(err)
 		this.Redirect("/topic", 302)
 	}
+	var toppic = new(Topic)
 	this.Data["Categorys"] = cates
 
 	this.TplName = "topic_add.html"

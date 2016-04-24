@@ -95,7 +95,7 @@ func GetAllCategorys() ([]*Category, error) {
 	return cates, err
 }
 
-func AddTopic(title, catid, content string) error {
+func AddTopic(title, catid, content, attachment string) error {
 	catIdNum, err := strconv.ParseInt(catid, 10, 64)
 	if err != nil {
 		return err
@@ -104,18 +104,19 @@ func AddTopic(title, catid, content string) error {
 	o := orm.NewOrm()
 
 	topic := &Topic{
-		Title:   title,
-		Catid:   catIdNum,
-		Content: content,
-		Created: time.Now(),
-		Updated: time.Now(),
+		Title:      title,
+		Catid:      catIdNum,
+		Content:    content,
+		Attachment: attachment,
+		Created:    time.Now(),
+		Updated:    time.Now(),
 	}
 
 	_, err = o.Insert(topic)
 	return err
 }
 
-func ModifyTopic(tid, title, catid, content string) error {
+func ModifyTopic(tid, title, catid, content, attachment string) error {
 	tidNum, err := strconv.ParseInt(tid, 10, 64)
 	if err != nil {
 		return err
@@ -126,15 +127,43 @@ func ModifyTopic(tid, title, catid, content string) error {
 		return err
 	}
 
+	var oldCatid int64
+	var oldAttach string
 	o := orm.NewOrm()
-
 	topic := &Topic{Id: tidNum}
 	if o.Read(topic) == nil {
+		oldCatid = topic.Catid
+		oldAttach = topic.Attachment
+
 		topic.Title = title
 		topic.Catid = catIdNum
 		topic.Content = content
+		topic.Attachment = attachment
 		topic.Updated = time.Now()
 		_, err = o.Update(topic)
+	}
+
+	// 删除旧的附件
+	if len(oldAttach) > 0 {
+		os.Remove(path.Join("attachment", oldAttach))
+	}
+
+	if oldCatid > 0 {
+		cate := new(Category)
+		qs := o.QueryTable("category")
+		err = qs.Filter("id", oldCatid).One(cate)
+		if err != nil {
+			cate.TopicCount--
+			_, err = o.Update(cate)
+		}
+	}
+
+	cate := new(Category)
+	qs := o.QueryTable("category")
+	err = qs.Filter("id", catIdNum).One(cate)
+	if err != nil {
+		cate.TopicCount++
+		_, err = o.Update(cate)
 	}
 
 	return err

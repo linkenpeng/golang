@@ -1,8 +1,10 @@
 package routers
 
 import (
-	"github.com/astaxie/beego"
 	"golang/blog/controllers"
+	"os"
+
+	"github.com/astaxie/beego"
 )
 
 func init() {
@@ -12,4 +14,9 @@ func init() {
 	beego.Router("/category", &controllers.CategoryController{})
 	beego.Router("/topic", &controllers.TopicController{})
 	beego.AutoRouter(&controllers.TopicController{})
+
+	// 创建附件目录
+	os.Mkdir("attachment", os.ModePerm)
+	// 静态文件
+	beego.SetStaticPath("/attachment", "attachment")
 }
