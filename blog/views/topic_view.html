@@ -3,11 +3,16 @@
 {{template "navigation" .}}
 
 <div class="container">
-  <h1>{{.Topic.Title}}
-  <a href="/topic" class="btn btn-default">返回列表</a>
-  </h1>
-
-  <div>{{.Topic.Content}}</div>
+	{{with .Topic}}
+	<h1>{{.Title}}
+		<a href="/topic" class="btn btn-default">返回列表</a>
+		<a href="/" class="btn btn-default">返回首页</a>
+  	</h1>
+	<div>
+	<h5>文章附件：<a href="/attachment/{{.Attachment}}" target="_blank">{{.Attachment}}</a></h5>
+	</div>
+  	<div>{{.Content}}</div>
+	{{end}}
 </div>
 
 {{template "footer" .}}

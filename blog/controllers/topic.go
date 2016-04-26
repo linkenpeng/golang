@@ -74,7 +74,7 @@ func (this *TopicController) Add() {
 		beego.Error(err)
 		this.Redirect("/topic", 302)
 	}
-	var toppic = new(Topic)
+
 	this.Data["Categorys"] = cates
 
 	this.TplName = "topic_add.html"
