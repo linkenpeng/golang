@@ -9,8 +9,10 @@ import (
 )
 
 func init() {
-	i18n.SetMessage("zh-CH", "conf/local_zh-CN.ini")
-	i18n.SetMessage("en-US", "conf/local_en-US.ini")
+	i18n.SetMessage("zh-CH", "conf/locale_zh-CN.ini")
+	i18n.SetMessage("en-US", "conf/locale_en-US.ini")
+	beego.AddFuncMap("i18n", i18n.Tr)
+
 	beego.Router("/", &controllers.MainController{})
 	beego.Router("/login", &controllers.LoginController{})
 	beego.Router("/hello", &controllers.HelloController{})
@@ -18,7 +20,7 @@ func init() {
 	beego.Router("/topic", &controllers.TopicController{})
 	beego.Router("/lang", &controllers.LangController{})
 	beego.AutoRouter(&controllers.TopicController{})
-	beego.AddFuncMap("i18n", i18n.Tr)
+
 	// 创建附件目录
 	os.Mkdir("attachment", os.ModePerm)
 
