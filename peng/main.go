@@ -5,7 +5,11 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	//"reflect"
+	"regexp"
 	"time"
+
+	"github.com/isdamir/mahonia"
 )
 
 type Fetcher interface {
@@ -98,20 +102,23 @@ func main() {
 
 		fmt.Print(body)
 		fmt.Print(resp.Body)
+
+		, "http://www.tmall.com/", "http://www.taobao.com/",
+		"http://china.alibaba.com/", "http://www.paipai.com/",
+		"http://www.amazon.cn/", "http://www.newegg.com.cn/", "http://www.vancl.com/", "http://www.yhd.com/",
+		"http://www.dangdang.com/", "http://www.m18.com/", "http://www.suning.com/",
+		"http://www.vip.com/"
 	*/
 	//runtime.GOMAXPROCS(4)
+
 	// 各大电商网站首页数据量大小检测
-	websites = []string{
-		"http://www.51buy.com/", "http://www.360buy.com/", "http://www.tmall.com/", "http://www.taobao.com/",
-		"http://china.alibaba.com/", "http://www.paipai.com/", "http://shop.qq.com/", "http://www.lightinthebox.com/",
-		"http://www.amazon.cn/", "http://www.newegg.com.cn/", "http://www.vancl.com/", "http://www.yihaodian.com/",
-		"http://www.dangdang.com/", "http://www.m18.com/", "http://www.suning.com/", "http://www.hstyle.com/",
-		"http://shop.vipshop.com/home.php"}
-	// 并发5个运行
+	websites = []string{"http://www.jd.com/"}
+	// 并发10个运行
 	pnum := 10 // 默认设置10个并发测试
 	parallelRequest(pnum, websites)
 }
 
+//http://www.oschina.net/code/snippet_170216_25349
 func parallelRequest(pnum int, websites []string) {
 	total := len(websites)
 	if pnum <= 0 {
@@ -155,9 +162,46 @@ func request(i int, url string, execChans chan bool, doneChans chan bool, fetchD
 		log.Printf("NO:%02d, url:%s, end, status:%t,time:%.3fs", i, url, isOk, processed)
 	})()
 	body, err := ioutil.ReadAll(resp.Body)
-	len := len(body)
-	fetchData[url] = fmt.Sprintf("len: %d", len)
+	//len := len(body)
+	html := string(body)
+	parseHTML(html)
+	//fmt.Println(html)
+	//fetchData[url] = fmt.Sprintf("len: %d", len)
 	if err == nil {
 		isOk = true
 	}
+
+	// to do解析html
+}
+
+func parseHTML(html string) []string {
+	var urls []string
+	fmt.Println(html)
+	enc := mahonia.NewEncoder("utf8")
+	html = enc.ConvertString(html)
+	fmt.Println(html)
+
+	// 匹配a标签 <a[^>]+?href=\"([^\"]+)\"[^>]*>([^<]+)</a>
+	fmt.Println("匹配a标签 Start...")
+	re := regexp.MustCompile(`<a[^>]+?href=["']?([^"']+)["']*>([^<]+)</a>`)
+	r := re.FindAllString(html, -1)
+	//fmt.Println(reflect.TypeOf(r))
+	urlsLen := len(r)
+	for i := 0; i < urlsLen; i++ {
+		fmt.Println(r[i])
+	}
+	fmt.Println("匹配A标签 End.\n")
+
+	// 匹配img标签
+	fmt.Println("匹配img标签 Start...")
+	re = regexp.MustCompile(`<img[^>]+src=["']?([^"']+)["']*>`)
+	r = re.FindAllString(html, -1)
+	//fmt.Println(reflect.TypeOf(r))
+	imgsLen := len(r)
+	for i := 0; i < imgsLen; i++ {
+		fmt.Println(r[i])
+	}
+	fmt.Println("匹配img标签 End.\n")
+
+	return urls
 }
